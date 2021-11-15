@@ -9,3 +9,23 @@ services:
       MYSQL_RANDOM_ROOT_PASSWORD: ${MYSQL_RANDOM_ROOT_PASSWORD}
     ports:
       - 3306:3306
+  server:
+    build: ./server
+    image: mango.azurecr.io/mango-server
+    working_dir: /home/node/app
+    command: npm run start-prod
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    environment:
+      PORT: 3000
+      TYPEORM_CONNECTION: mysql
+      TYPEORM_HOST: db
+      TYPEORM_USERNAME: ${MYSQL_USER}
+      TYPEORM_PASSWORD: ${MYSQL_PASSWORD}
+      TYPEORM_DATABASE: ${MYSQL_DATABASE}
+      TYPEORM_PORT: 3306
+      TYPEORM_SYNCHRONIZE: 'true'
+      TYPEORM_LOGGING: 'false'
+      TYPEORM_ENTITIES: src/**/entity.ts
