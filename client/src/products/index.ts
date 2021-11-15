@@ -5,6 +5,7 @@
 /**
  * Components
  */
+export { Products } from './presentation/Products';
 export { Product } from './presentation/Product';
 
 /**
