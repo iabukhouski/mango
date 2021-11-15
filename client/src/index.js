@@ -55,6 +55,21 @@ const readProduct =
     }
   }
 
+const createReview =
+  async (productId, review) => {
+    try {
+
+      return await request(
+        `POST`,
+        `products/${productId}/reviews`,
+        review,
+      );
+    } catch (error) {
+
+      alert(`Error: Cannot create the review.`);
+    }
+  }
+
 /**********************
  * Presentation Layer *
  **********************/
@@ -239,6 +254,29 @@ const renderPage =
     renderReviews(product.reviews);
   }
 
+/**
+ * Modal
+ */
+const showModal =
+  () => {
+
+    const modal = document.getElementById(`modal`);
+
+    modal.classList.add(`modal--active`);
+  }
+
+const hideModal =
+  () => {
+
+    const modal = document.getElementById(`modal`);
+
+    modal.classList.remove(`modal--active`);
+
+    const form = document.getElementById(`form`)
+
+    form.reset();
+  }
+
 const getProductId =
   () => {
 
@@ -248,6 +286,34 @@ const getProductId =
 /********
  * Init *
  ********/
+
+const form = document.getElementById(`form`);
+
+form.addEventListener(
+  `submit`,
+  async (event) => {
+    event.preventDefault();
+
+    const input = document.querySelector('.rating-selector__input[name="rating"]:checked');
+    const reviewScore = parseInt(input.value);
+
+    const textarea = document.getElementById(`form__description`);
+    const reviewDescription = textarea.value;
+
+    const productId = getProductId();
+    await createReview(
+      productId,
+      {
+        score: reviewScore,
+        description: reviewDescription,
+      },
+    );
+
+    const product = await readProduct(productId);
+
+    renderPage(product);
+  }
+);
 
 (
   async () => {
