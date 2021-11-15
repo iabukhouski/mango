@@ -1,15 +1,17 @@
 import express from 'express';
 import * as R from 'ramda';
+import { broadcastProduct } from '../../products';
+import { broadcastReviews } from './ws';
 
 export const router = express.Router();
 
 /**
  * List Reviews
  */
-import { listReviews } from './data';
+import { listReviews } from '../dal/data';
 
 router.get(
-  '/products/:productId/reviews',
+  `/products/:productId/reviews`,
   async (req, res): Promise<void> => {
 
     const reviews = await listReviews(req.params.productId);
@@ -23,13 +25,18 @@ router.get(
 /**
  * Create Review
  */
-import { createReview } from './data';
+import { createReview } from '../dal/data';
 
 router.post(
-  '/products/:productId/reviews',
+  `/products/:productId/reviews`,
   async (req, res): Promise<void> => {
 
-    const review = await createReview(req.params.productId)(req.body);
+    const productId = req.params.productId;
+
+    const review = await createReview(productId)(req.body);
+
+    await broadcastReviews(productId);
+    await broadcastProduct(productId);
 
     res
       .status(201)
@@ -40,10 +47,10 @@ router.post(
 /**
  * Read Review
  */
-import { readReview } from './data';
+import { readReview } from '../dal/data';
 
 router.get(
-  '/products/:productId/reviews/:reviewId',
+  `/products/:productId/reviews/:reviewId`,
   async (req, res) => {
 
     const review = await readReview(req.params.reviewId);
@@ -66,10 +73,10 @@ router.get(
 /**
  * Update Review
  */
-import { updateReview } from './data';
+import { updateReview } from '../dal/data';
 
 router.patch(
-  '/products/:productId/reviews/:reviewId',
+  `/products/:productId/reviews/:reviewId`,
   async (req, res) => {
 
     const review = await updateReview(req.params.reviewId)(req.body);
@@ -83,6 +90,11 @@ router.patch(
       return;
     }
 
+    const productId = req.params.productId;
+
+    await broadcastReviews(productId);
+    await broadcastProduct(productId);
+
     res
       .status(200)
       .send(review);
@@ -93,10 +105,10 @@ router.patch(
 /**
  * Delete Review
  */
-import { deleteReview } from './data';
+import { deleteReview } from '../dal/data';
 
 router.delete(
-  '/products/:productId/reviews/:reviewId',
+  `/products/:productId/reviews/:reviewId`,
   async (req, res) => {
 
     const review = await deleteReview(req.params.reviewId);
@@ -110,9 +122,13 @@ router.delete(
       return;
     }
 
+    const productId = req.params.productId;
+
+    await broadcastReviews(productId);
+    await broadcastProduct(productId);
+
     res
       .status(204)
       .send();
   },
 );
-

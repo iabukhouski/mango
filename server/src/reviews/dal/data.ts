@@ -1,13 +1,12 @@
 import { getRepository } from 'typeorm';
 import * as R from 'ramda';
-import { Product } from '../products/entity';
 import { Review } from './entity';
 
 /**
  * List Reviews
  */
 export const listReviews =
-  async (productId: Product['id']): Promise<Review[]> => {
+  async (productId: Review['productId']): Promise<Review[]> => {
 
     const repository = getRepository(Review);
 
@@ -25,7 +24,7 @@ export const listReviews =
  * Create Review
  */
 export const createReview =
-  (productId: Product['id']) =>
+  (productId: Review['productId']) =>
     async (partialReview: Pick<Review, 'score' | 'description'>): Promise<Review | undefined> => {
 
       const repository = getRepository(Review);

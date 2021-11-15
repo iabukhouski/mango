@@ -30,10 +30,20 @@ export const server = createServer(app);
  * Simple routing for `ws` server
  */
 import { JSON } from './index.d';
+import { isReadProductPayload, broadcastProduct } from './products';
+import { isListReviewsPayload, broadcastReviews } from './reviews';
 
 const onConnection =
   (payload: JSON) => {
+    if (isReadProductPayload(payload)) {
 
+      broadcastProduct(payload.params.productId);
+    }
+
+    if (isListReviewsPayload(payload)) {
+
+      broadcastReviews(payload.params.productId);
+    }
   };
 
 import { configureWebSocketsServer } from './presentation';

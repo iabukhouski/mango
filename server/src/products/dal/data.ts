@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 import * as R from 'ramda';
 import { Product } from './entity';
-import { Review } from '../reviews/entity';
+import { Review } from '../../reviews/dal/entity';
 
 /**
  * List Products
@@ -19,7 +19,7 @@ export const listProducts =
  * Create Product
  */
 export const createProduct =
-  async (partialProduct: Pick<Product, 'name'>): Promise<Product | undefined> => {
+  async (partialProduct: Pick<Product, `name`>): Promise<Product | undefined> => {
 
     const repository = getRepository(Product);
 
@@ -53,7 +53,7 @@ export const readProduct =
         (subQuery) => {
 
           return subQuery
-            .select(`AVG(review.score)`)
+            .select(`ROUND(AVG(review.score), 1)`)
             .from(Review, `review`)
             .where(`review.productId = :productId`, { productId });
         },
@@ -95,7 +95,7 @@ export const readProduct =
  */
 export const updateProduct =
   (productId: Product['id']) =>
-    async (partialProduct: Pick<Product, 'name'>): Promise<Product | undefined> => {
+    async (partialProduct: Pick<Product, `name`>): Promise<Product | undefined> => {
 
       const repository = getRepository(Product);
 

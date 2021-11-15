@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Review } from '../reviews/entity';
+import { Review } from '../../reviews/dal/entity';
 
 @Entity(
   {

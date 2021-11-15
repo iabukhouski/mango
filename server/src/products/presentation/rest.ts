@@ -1,12 +1,13 @@
 import express from 'express';
 import * as R from 'ramda';
+import { broadcastProduct } from './ws';
 
 export const router = express.Router();
 
 /**
  * List Products
  */
-import { listProducts } from './data';
+import { listProducts } from '../dal/data';
 
 router.get(
   `/products`,
@@ -23,7 +24,7 @@ router.get(
 /**
  * Create Product
  */
-import { createProduct } from './data';
+import { createProduct } from '../dal/data';
 
 router.post(
   `/products`,
@@ -42,13 +43,15 @@ router.post(
 /**
  * Read Product
  */
-import { readProduct } from './data';
+import { readProduct } from '../dal/data';
 
 router.get(
-  '/products/:productId',
+  `/products/:productId`,
   async (req, res) => {
 
-    const product = await readProduct(req.params.productId);
+    const productId = req.params.productId;
+
+    const product = await readProduct(productId);
 
     if (R.isNil(product)) {
 
@@ -62,19 +65,23 @@ router.get(
     res
       .status(200)
       .send(product);
+
+    await broadcastProduct(productId);
   },
 );
 
 /**
  * Update Product
  */
-import { updateProduct } from './data';
+import { updateProduct } from '../dal/data';
 
 router.patch(
-  '/products/:productId',
+  `/products/:productId`,
   async (req, res) => {
 
-    const product = await updateProduct(req.params.productId)(req.body);
+    const productId = req.params.productId;
+
+    const product = await updateProduct(productId)(req.body);
 
     if (R.isNil(product)) {
 
@@ -88,20 +95,23 @@ router.patch(
     res
       .status(200)
       .send(product);
+
+    await broadcastProduct(productId);
   },
 );
-
 
 /**
  * Delete Product
  */
-import { deleteProduct } from './data';
+import { deleteProduct } from '../dal/data';
 
 router.delete(
-  '/products/:productId',
+  `/products/:productId`,
   async (req, res) => {
 
-    const product = await deleteProduct(req.params.productId);
+    const productId = req.params.productId;
+
+    const product = await deleteProduct(productId);
 
     if (R.isNil(product)) {
 
@@ -115,5 +125,7 @@ router.delete(
     res
       .status(204)
       .send();
+
+    await broadcastProduct(productId);
   },
 );
