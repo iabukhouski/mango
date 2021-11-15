@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 import * as R from 'ramda';
 import { Product } from './entity';
+import { Review } from '../reviews/entity';
 
 /**
  * List Products
@@ -33,17 +34,60 @@ export const createProduct =
 /**
  * Read Product
  */
+type ProductComputedValues = {
+  avgScore?: number;
+};
+
+type ProductReadView =
+  & Product
+  & ProductComputedValues;
+
 export const readProduct =
-  async (productId: Product['id']): Promise<Product | undefined> => {
+  async (productId: Product['id']): Promise<ProductReadView | undefined> => {
 
     const repository = getRepository(Product);
 
-    const product = await repository
+    const rawAndEntities = await repository
       .createQueryBuilder(`product`)
-      .where(`product.id = :productId`, { productId })
-      .findOne();
+      .addSelect(
+        (subQuery) => {
 
-    return product;
+          return subQuery
+            .select(`AVG(review.score)`)
+            .from(Review, `review`)
+            .where(`review.productId = :productId`, { productId });
+        },
+        `avgScore`,
+      )
+      .leftJoinAndSelect(`product.reviews`, `review`)
+      .where(`product.id = :productId`, { productId })
+      .orderBy(`review.createdAt`, `DESC`)
+      /**
+       * @see https://github.com/typeorm/typeorm/issues/296
+       * Unfortunately, TypeORM does not support yet somethink like `addSelectAndMap` or `ComputedColumn`
+       */
+      .getRawAndEntities();
+
+    const entity = rawAndEntities.entities[0];
+    const raw = rawAndEntities.raw[0];
+
+    if (R.isNil(entity) || R.isNil(raw)) {
+
+      return undefined;
+    }
+
+    /**
+     * `raw.avgScore` is `null` if the product has 0 reviews
+     */
+    const avgScore =
+      R.isNil(raw.avgScore)
+        ? undefined
+        : parseFloat(raw.avgScore);
+
+    return {
+      ...entity,
+      avgScore,
+    };
   }
 
 /**

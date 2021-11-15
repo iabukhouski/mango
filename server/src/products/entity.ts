@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Review } from '../reviews/entity';
 
 @Entity(
   {
@@ -14,6 +15,9 @@ export class Product {
 
   @Column({ length: `256` })
   name: string;
+
+  @OneToMany(() => Review, review => review.product)
+  reviews: Review[];
 
   @CreateDateColumn()
   createdAt: Date;

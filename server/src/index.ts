@@ -12,10 +12,16 @@ app.use(express.json());
  */
 import { router as productsRouter } from './products';
 
+/**
+ * Reviews
+ */
+import { router as reviewsRouter } from './reviews';
+
 app.use(
   '/api',
   [
     productsRouter,
+    reviewsRouter,
   ],
 );
 
