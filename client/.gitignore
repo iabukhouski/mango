@@ -1,0 +1,4 @@
+# This would be turned on in an actual project
+# .env
+node_modules
+build
