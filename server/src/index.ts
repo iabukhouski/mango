@@ -1,29 +1,6 @@
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
-import express from 'express';
-
-const app = express();
-const port = 3000;
-
-app.use(express.json());
-
-/**
- * Products
- */
-import { router as productsRouter } from './products';
-
-/**
- * Reviews
- */
-import { router as reviewsRouter } from './reviews';
-
-app.use(
-  '/api',
-  [
-    productsRouter,
-    reviewsRouter,
-  ],
-);
+import { server, startWebSocketsServer } from './servers';
 
 /**
  * Init
@@ -31,12 +8,16 @@ app.use(
 (
   async () => {
 
+    const port = process.env.PORT || 3000;
+
     await createConnection();
 
-    app.listen(
+    startWebSocketsServer();
+
+    server.listen(
       port,
       () => {
-        console.log(`Example app listening at http://localhost:${port}`);
+        console.log(`Listening at http://localhost:${port}`);
       },
     );
   }
