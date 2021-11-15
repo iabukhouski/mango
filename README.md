@@ -8,10 +8,18 @@
 
 ### Start
 
-### Step 1: Start `Mango` locally
+#### Step 1: Build Containers
+```sh
+  ./build.sh
+```
+
+### Step 2: Start `Mango` locally
 ```sh
   ./start.sh
 ```
+
+### Step 2: Visit `Mango Web App` at
+http://localhost
 
 ## Production
 
