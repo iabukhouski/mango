@@ -8,6 +8,18 @@ const port = 3000;
 app.use(express.json());
 
 /**
+ * Products
+ */
+import { router as productsRouter } from './products';
+
+app.use(
+  '/api',
+  [
+    productsRouter,
+  ],
+);
+
+/**
  * Init
  */
 (
